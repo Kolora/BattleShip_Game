@@ -11,4 +11,4 @@ Game Strategy- 2 player game
 7. Game over state!
 8. If any of the player hits 5 ships or both of the players reach the threshold (i.e 10 tries) it automatically resets the game
 9. The winner will be determined based on the player with the highest score.
-# Battleship_Game
+
