@@ -1,8 +1,8 @@
 // Game constants
 const grid_size = 5; // 5x5 grid
-const ship_length = 3; // # length of ship
+const ship_length = 3; // # ship placements in grid
 
-const HIT_UPPER_LIMIT = 5; // Max number of hits per player:5 ships, if no hits then game is over
+const HIT_UPPER_LIMIT = 5; // Max number of hits per player:5 ships
 const MAX_TRIES_PER_PLAYER = 10; // Max number of tries per player:10
 
 let playerOneScore = 0;
@@ -12,26 +12,29 @@ let playerTwoScore = 0;
 let playerTwoClickCounter = 0;
 
 let PLAYERS = {
+  //defines an object called "PLAYERS" to store player names and scores
   1: "Player 1",
   2: "Player 2",
 };
 
 // Game state
-let currentPlayer = 1;
+let currentPlayer = 1; //declare variable of current player
 let playerGrids = {
+  //defines an object called "playerGrids" to store the grid cells of each player
   1: [],
   2: [],
 };
-
-let game_over = false;
+let game_over = false; //declare variable of game over
 
 // Create grid cells
 function createGridCellsInDOM() {
-  const gridElement = document.getElementById("grid");
+  //function to create and append grid cells to the DOM
+  const gridElement = document.getElementById("grid"); // this element represents the container where the grid cells will be appended.
 
   // First check if the GRID all ready has children, if yes then remove them
 
   while (gridElement.hasChildNodes()) {
+    //first retrieves grid element and clears any existing grid cells.
     gridElement.removeChild(gridElement.firstChild);
   }
 
@@ -41,29 +44,33 @@ function createGridCellsInDOM() {
     // ROW
     for (let j = 0; j < grid_size; j++) {
       // COL
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      cell.dataset.row = i;
-      cell.dataset.col = j;
-      cell.addEventListener("click", handleCellClick); //assigning event handler to cell
-      gridElement.appendChild(cell);
-      playerGrids[1].push(cell);
-      playerGrids[2].push(cell.cloneNode());
+      const cell = document.createElement("div"); //creates a new div element,which will represent a single grid cell.
+      cell.className = "cell"; //the 'classname' property sets the CSS class of the "cell" element to each cell.
+      cell.dataset.row = i; //dataset property sets the data attribute of the "cell" element to each cell.
+      cell.dataset.col = j; //here row and col attributes are being set with values i and j respectively to retrieve position of cell in grid.
+
+      //assigning event handler to cell
+      cell.addEventListener("click", handleCellClick); //event listener is added to "cell" element listening for "click" event.
+      //when cell is clicked "handleCellClick" function is called.
+      gridElement.appendChild(cell); //appends the cell to the grid element.
+      playerGrids[1].push(cell); //PlayerGrids array stores the grid cells for each player //pushes the cell to playerGrids[1]
+      playerGrids[2].push(cell.cloneNode()); //clones the "cell"element using cloneNode() fn,thus each player has separate reference to grid cell.
     }
   }
 }
 
 // Event handler for cell click
 function handleCellClick(event) {
-  const cell = event.target;
+  //defines handleCellClick function that serves as event handler for "click" event.
+  const cell = event.target; //retrieves the clicked cell
   console.log(cell);
 
-  const row = parseInt(cell.dataset.row);
-  const col = parseInt(cell.dataset.col);
-  const playerGrid = playerGrids[currentPlayer];
+  const row = parseInt(cell.dataset.row); //extracts the row and column values from the dataset attributes of the clicked cell.
+  const col = parseInt(cell.dataset.col); //parseint() converts extracted values from strings to integers.
+  const playerGrid = playerGrids[currentPlayer]; //retrieves grid cells for current player from playergrids object based on current player.
 
   if (currentPlayer == 1) {
-    playerOneClickCounter += 1; //based on the number of clicks per player hit or miss
+    playerOneClickCounter += 1; //these counters keep track of # of clicks per player regardless hit or miss, increments click counter for current player.
   } else {
     playerTwoClickCounter += 1;
   }
@@ -74,9 +81,12 @@ function handleCellClick(event) {
   ) {
     return; // Cell already attacked
   }
+  //if cells has either hit or miss class it means that cell has already been attacked & function returns early and no further action take.
+  //index of clicked cell in playergrid is calculated by row * grid_size + col.
 
   // Check if ship is hit
   if (cell.classList.contains("ship")) {
+    //if clicked cell has ship class then it is hit.
     cell.classList.add("hit");
     if (String(PLAYERS[currentPlayer]) == "Player 1") {
       cell.classList.add("player_1_cell");
@@ -96,14 +106,14 @@ function handleCellClick(event) {
 
   if (playerOneScore == HIT_UPPER_LIMIT || playerTwoScore == HIT_UPPER_LIMIT) {
     declareWinner(currentPlayer);
-    return;
+    return; //checks if either player reached maximum score to declare winner
   }
 
   function declareWinner(currentPlayer) {
     alert(`Player ${currentPlayer} Won the game!!!`);
     resetGame();
   }
-  // if both players have the same number of ships then declare game is a draw, if not declare game is a win
+  // in 10 tries each, if both players have the same number of ships then declare game is a draw, if not declare game is a win
   if (
     playerOneClickCounter == MAX_TRIES_PER_PLAYER &&
     playerTwoClickCounter == MAX_TRIES_PER_PLAYER
@@ -140,7 +150,7 @@ function check_for_game_end_state() {
   ) {
     game_over = true;
     alert("Game Over !!!");
-    resetGame();
+    resetGame(); //resets game state and ready for new gameplay!
   }
 }
 
@@ -170,20 +180,21 @@ placeShips(2);
 
 // Function to randomly place ships for a player
 function placeShips(player) {
-  const playerGrid = playerGrids[player];
+  const playerGrid = playerGrids[player]; //represents grid of specific player.
 
   for (let ship = 0; ship < ship_length; ship++) {
-    const shipPosition = getRandomPosition();
+    //loop is responsible for placing ships on players grid.
+    const shipPosition = getRandomPosition(); //generates random position on grid
 
     // Check if ship position is already occupied
     if (playerGrid[shipPosition].classList.contains("ship")) {
       ship--; // Retry placing the ship
-      continue;
+      continue; //proceeds to next iteration
     }
 
-    // Place the ship TO DO
+    // Place the ship TO DO //this code block proceeds if ship position is not occupied
     for (let i = 0; i < ship_length; i++) {
-      const cell = playerGrid[shipPosition + i];
+      const cell = playerGrid[shipPosition + i]; //access appropriate cell in playerGrid
       cell.classList.add("ship");
     }
   }
